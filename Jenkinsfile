@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "frontend-app-jen"
-        CONTAINER_NAME = "frontend-container-jen"
+        IMAGE_NAME = "my-project"
+        CONTAINER_NAME = "my-first-project"
     }
 
     stages {
@@ -11,7 +11,8 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/ITROOTIX-1/project2.git'
+                    url: 'https://github.com/Bhanu231003/Docker-files.git',
+                    CredentialsId:'docker-creds'
             }
         }
 
