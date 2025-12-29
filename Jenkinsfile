@@ -1,34 +1,53 @@
 pipeline {
-    agent { 
-        label 'docker-agent'  // Use node labeled 'docker-agent'
-    }
-    
+    agent any
+
     environment {
-        registry = "bhanu180/docker"
-        registryCredential = 'dockerhub-creds'
-        dockerImage = ''
+        IMAGE_NAME = "frontend-app-jen"
+        CONTAINER_NAME = "frontend-container-jen"
     }
-    
+
     stages {
-        stage('Checkout') { steps { checkout scm } }
-        
-        stage('Build Docker Image') {
+
+        stage('Clone Repository') {
             steps {
-                script {
-                    dockerImage = docker.build("${registry}:${BUILD_NUMBER}")
-                }
+                git branch: 'main',
+                    url: 'https://github.com/ITROOTIX-1/project2.git'
             }
         }
-        
-        stage('Push Image') {
+
+        stage('Build Docker Image') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', registryCredential) {
-                        dockerImage.push()
-                        dockerImage.push('latest')
-                    }
-                }
+                bat '''
+                "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" build -t %IMAGE_NAME%:latest .
+                 
+                '''
             }
+        }
+
+        stage('Stop Old Container') {
+            steps {
+                bat '''
+                "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" docker stop %CONTAINER_NAME% || exit 0  docker rm %CONTAINER_NAME% || exit 0
+                
+                '''
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                bat '''"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" run --detach -p 6999:80 --name %CONTAINER_NAME% %IMAGE_NAME%:latest'''
+                
+                
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "🚀 Docker container deployed successfully on Windows!"
+        }
+        failure {
+            echo "❌ Pipeline failed"
         }
     }
 }
