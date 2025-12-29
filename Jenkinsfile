@@ -12,7 +12,7 @@ pipeline {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/Bhanu231003/Docker-files.git',
-                    CredentialsId:'docker-creds'
+                    credentialsId:'docker-creds'
             }
         }
 
