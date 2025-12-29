@@ -1,19 +1,16 @@
 pipeline {
-    agent any
+    agent { 
+        label 'docker-agent'  // Use node labeled 'docker-agent'
+    }
     
     environment {
-        registry = "bhanu180/docker"  // Your Docker Hub repo
-        registryCredential = 'dockerhub-creds'  // Create this credential in Jenkins
+        registry = "bhanu180/docker"
+        registryCredential = 'dockerhub-creds'
         dockerImage = ''
     }
     
     stages {
-        stage('Checkout') {
-            steps {
-                // Works in Pipeline from SCM / Multibranch
-                checkout scm
-            }
-        }
+        stage('Checkout') { steps { checkout scm } }
         
         stage('Build Docker Image') {
             steps {
@@ -30,17 +27,6 @@ pipeline {
                         dockerImage.push()
                         dockerImage.push('latest')
                     }
-                }
-            }
-        }
-    }
-    
-    post {
-        always {
-            script {
-                if (dockerImage) {
-                    sh "docker rmi ${registry}:${BUILD_NUMBER} || true"
-                    sh "docker rmi ${registry}:latest || true"
                 }
             }
         }
